@@ -3,6 +3,8 @@ STACK SEGMENT PARA STACK
 STACK ENDS
 
 DATA SEGMENT PARA 'DATA'
+
+    TIME_AUX DB 0 ;time change check var
     BALL_X DW 0Ah ; x pos
     BALL_Y DW 0Ah ; y pos
     BALL_SIZE DW 04h ;ball size
@@ -29,7 +31,17 @@ CODE SEGMENT PARA 'CODE'
         MOV BL,00h ;black
         INT 10h
 
-        CALL DRAW_BALL
+        CHECK_TIME:
+            MOV AH,2Ch ;get the time
+            INT 21h 
+
+            CMP DL,TIME_AUX ;time has changed?
+            JE CHECK_TIME 
+            
+            MOV TIME_AUX,DL ;update time
+            CALL DRAW_BALL
+
+            JMP CHECK_TIME
 
         RET
     MAIN ENDP
